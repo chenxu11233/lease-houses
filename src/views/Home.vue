@@ -1,18 +1,36 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <Header></Header>
+    <VSideBar></VSideBar>
+    <div class="content-box" :class="{ 'content-collapse': collapse }">
+      <div class="content">
+        <router-view></router-view>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import Header from "@/components/Header.vue";
+import VSideBar from "@/components/VSideBar.vue";
+import bus from "../assets/js/bus";
 
 export default {
   name: "Home",
+  data() {
+    return {
+      collapse: false,
+    };
+  },
   components: {
-    HelloWorld,
+    Header,
+    VSideBar,
+  },
+  created() {
+    bus.$on("collapse-content", (msg) => {
+      this.collapse = msg;
+    });
   },
 };
 </script>
