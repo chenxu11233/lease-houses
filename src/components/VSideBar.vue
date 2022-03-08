@@ -57,108 +57,91 @@ export default {
   data() {
     return {
       collapse: false,
-      items: [
-        {
-          icon: "el-icon-lx-home",
-          index: "dashboard",
-          title: "系统首页",
-        },
-        {
-          icon: "el-icon-lx-cascades",
-          index: "table",
-          title: "基础表格",
-        },
-        {
-          icon: "el-icon-lx-copy",
-          index: "tabs",
-          title: "tab选项卡",
-        },
-        {
-          icon: "el-icon-lx-calendar",
-          index: "3",
-          title: "表单相关",
-          subs: [
-            {
-              index: "form",
-              title: "基本表单",
-            },
-            {
-              index: "3-2",
-              title: "三级菜单",
-              subs: [
-                {
-                  index: "editor",
-                  title: "富文本编辑器",
-                },
-                {
-                  index: "markdown",
-                  title: "markdown编辑器",
-                },
-              ],
-            },
-            {
-              index: "upload",
-              title: "文件上传",
-            },
-          ],
-        },
-        {
-          icon: "el-icon-lx-emoji",
-          index: "icon",
-          title: "自定义图标",
-        },
-        {
-          icon: "el-icon-pie-chart",
-          index: "charts",
-          title: "schart图表",
-        },
-        {
-          icon: "el-icon-rank",
-          index: "6",
-          title: "拖拽组件",
-          subs: [
-            {
-              index: "drag",
-              title: "拖拽列表",
-            },
-            {
-              index: "dialog",
-              title: "拖拽弹框",
-            },
-          ],
-        },
-        {
-          icon: "el-icon-lx-global",
-          index: "i18n",
-          title: "国际化功能",
-        },
-        {
-          icon: "el-icon-lx-warn",
-          index: "7",
-          title: "错误处理",
-          subs: [
-            {
-              index: "permission",
-              title: "权限测试",
-            },
-            {
-              index: "404",
-              title: "404页面",
-            },
-          ],
-        },
-        {
-          icon: "el-icon-lx-redpacket_fill",
-          index: "/donate",
-          title: "支持作者",
-        },
-      ],
+      items: [],
     };
   },
   computed: {
     onRoutes() {
       return this.$route.path.replace("/", "");
     },
+  },
+  mounted() {
+    this.items = [
+      // landord
+      {
+        icon: "el-icon-user",
+        index: "landlordSetting",
+        title: "个人信息",
+      },
+      {
+        icon: "el-icon-house",
+        index: "infoList",
+        title: "房屋管理",
+      },
+      {
+        icon: "el-icon-set-up",
+        title: "出租管理",
+        index: 1,
+        subs: [
+          {
+            icon: "el-icon-document-checked",
+            index: "rentedList",
+            title: "已租信息",
+          },
+          {
+            icon: "el-icon-tickets",
+            index: "rentingList",
+            title: "待租信息",
+          },
+        ],
+      },
+      // lodger
+      {
+        icon: "el-icon-user",
+        index: "lodgerSetting",
+        title: "个人信息",
+      },
+      {
+        icon: "el-icon-money",
+        index: "lodgerRentingList",
+        title: "查看房屋",
+      },
+      {
+        icon: "el-icon-discount",
+        title: "我的租房",
+        index: 2,
+        subs: [
+          {
+            icon: "el-icon-document-checked",
+            index: "lodgerpenddingList",
+            title: "待处理",
+          },
+          {
+            icon: "el-icon-tickets",
+            index: "lodgerRentedList",
+            title: "已租房屋",
+          },
+        ],
+      },
+      // admin
+      {
+        icon: "el-icon-connection",
+        title: "用户管理",
+        index: 3,
+        subs: [
+          {
+            icon: "el-icon-document-checked",
+            index: "lodgerpenddingList",
+            title: "租客列表",
+          },
+          {
+            icon: "el-icon-tickets",
+            index: "lodgerRentedList",
+            title: "房东列表",
+          },
+        ],
+      },
+    ];
   },
   created() {
     // 通过 Event Bus 进行组件间通信，来折叠侧边栏

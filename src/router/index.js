@@ -7,17 +7,51 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
+    redirect: "/infoList",
+  },
+  {
+    path: "/login",
     name: "Login",
     component: Login,
   },
   {
-    path: "/home",
-    name: "Home",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Home.vue"),
+    path: "/",
+    component: () => import("../views/Home.vue"),
+    meta: { title: "" },
+    children: [
+      {
+        path: "/infoList",
+        component: () => import("../views/landlord/InfoList.vue"),
+      },
+      {
+        path: "/landlordSetting",
+        component: () => import("../views/landlord/Setting.vue"),
+      },
+      {
+        path: "/rentedList",
+        component: () => import("../views/landlord/RentedList.vue"),
+      },
+      {
+        path: "/rentingList",
+        component: () => import("../views/landlord/RentingList.vue"),
+      },
+      {
+        path: "/lodgerSetting",
+        component: () => import("../views/lodger/Setting.vue"),
+      },
+      {
+        path: "/lodgerRentingList",
+        component: () => import("../views/lodger/InfoList.vue"),
+      },
+      {
+        path: "/lodgerpenddingList",
+        component: () => import("../views/lodger/PenddingList.vue"),
+      },
+      {
+        path: "/lodgerRentedList",
+        component: () => import("../views/lodger/RentedList.vue"),
+      },
+    ],
   },
 ];
 
