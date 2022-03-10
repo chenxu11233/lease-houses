@@ -29,7 +29,6 @@
           <el-button type="primary" @click="submitForm()">登录</el-button>
           <el-button type="warning" @click="changeRegister()">注册</el-button>
         </div>
-        <p class="login-tips">Tips : 用户名和密码随便填。</p>
       </el-form>
       <el-form
         :model="param"
@@ -54,6 +53,17 @@
             <i slot="prefix" class="el-icon-key"></i>
           </el-input>
         </el-form-item>
+        <el-form-item prop="type">
+          <el-select v-model="param.type" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
         <div class="login-btn">
           <el-button type="warning" @click="submitForm()">确定</el-button>
         </div>
@@ -77,6 +87,19 @@ export default {
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
       },
       register: false,
+      options: [
+        {
+          label: "房客",
+          value: 1,
+        },
+        {
+          label: "房东",
+          value: 2,
+        },
+      ],
+      userInfo: {
+        type: 2,
+      },
     };
   },
   methods: {
@@ -85,7 +108,14 @@ export default {
         if (valid) {
           this.$message.success("登录成功");
           localStorage.setItem("ms_username", this.param.username);
-          this.$router.push("/home");
+          // 1 访客  2房东  0admin
+          if (this.userInfo.type === 2) {
+            this.$router.push("/infoList");
+          } else if (this.userInfo.type === 1) {
+            this.$router.push("/lodgerRentingList");
+          } else {
+            this.$router.push("/adminLandlordList");
+          }
         } else {
           this.$message.error("请输入账号和密码");
           console.log("error submit!!");
@@ -131,6 +161,9 @@ export default {
 }
 .ms-content i {
   font-size: 18px;
+}
+.ms-content .el-select {
+  width: 100%;
 }
 .login-btn {
   text-align: center;

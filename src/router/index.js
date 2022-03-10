@@ -51,6 +51,26 @@ const routes = [
         path: "/lodgerRentedList",
         component: () => import("../views/lodger/RentedList.vue"),
       },
+      {
+        path: "/adminLandlordList",
+        component: () => import("../views/admin/LandlordList.vue"),
+      },
+      {
+        path: "/adminLodgerList",
+        component: () => import("../views/admin/LodgerList.vue"),
+      },
+      {
+        path: "/adminContractList",
+        component: () => import("../views/admin/ContractList.vue"),
+      },
+      {
+        path: "/adminRoomCheck",
+        component: () => import("../views/admin/RoomCheck.vue"),
+      },
+      {
+        path: "/adminLodgerCheck",
+        component: () => import("../views/admin/LodgerCheck.vue"),
+      },
     ],
   },
 ];

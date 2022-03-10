@@ -131,13 +131,35 @@ export default {
         subs: [
           {
             icon: "el-icon-document-checked",
-            index: "lodgerpenddingList",
+            index: "adminLandlordList",
             title: "租客列表",
           },
           {
             icon: "el-icon-tickets",
-            index: "lodgerRentedList",
+            index: "adminLodgerList",
             title: "房东列表",
+          },
+        ],
+      },
+      {
+        icon: "el-icon-connection",
+        title: "租房管理",
+        index: 4,
+        subs: [
+          {
+            icon: "el-icon-document-checked",
+            index: "adminRoomCheck",
+            title: "房源审核",
+          },
+          {
+            icon: "el-icon-tickets",
+            index: "adminLodgerCheck",
+            title: "租房审核",
+          },
+          {
+            icon: "el-icon-tickets",
+            index: "adminContractList",
+            title: "合同管理",
           },
         ],
       },
