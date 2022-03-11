@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import { login } from "../api/index";
 export default {
   data: function () {
     return {
@@ -90,32 +91,38 @@ export default {
       options: [
         {
           label: "房客",
-          value: 1,
+          value: 0,
         },
         {
           label: "房东",
-          value: 2,
+          value: 1,
         },
       ],
-      userInfo: {
-        type: 2,
-      },
     };
   },
   methods: {
+    login() {
+      login({
+        account: this.param.username,
+        password: this.param.password,
+      }).then((res) => {
+        this.$message.success("登录成功", 2);
+        localStorage.setItem("ms_username", res.data.account);
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
+        // 0 访客  1房东  2 admin
+        if (Number(res.data.type) === 1) {
+          this.$router.push("/infoList");
+        } else if (Number(res.data.type) === 0) {
+          this.$router.push("/lodgerRentingList");
+        } else {
+          this.$router.push("/adminLandlordList");
+        }
+      });
+    },
     submitForm() {
       this.$refs.login.validate((valid) => {
         if (valid) {
-          this.$message.success("登录成功");
-          localStorage.setItem("ms_username", this.param.username);
-          // 1 访客  2房东  0admin
-          if (this.userInfo.type === 2) {
-            this.$router.push("/infoList");
-          } else if (this.userInfo.type === 1) {
-            this.$router.push("/lodgerRentingList");
-          } else {
-            this.$router.push("/adminLandlordList");
-          }
+          this.login();
         } else {
           this.$message.error("请输入账号和密码");
           console.log("error submit!!");

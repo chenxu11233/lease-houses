@@ -9,7 +9,7 @@
     </div> -->
     <div class="container">
       <div class="handle-box">
-        <el-form ref="form" :model="form" :inline="true">
+        <el-form ref="form" :model="query" :inline="true">
           <el-form-item label="地区">
             <el-cascader
               placeholder="地区"
@@ -19,18 +19,18 @@
             ></el-cascader>
           </el-form-item>
           <el-form-item label="是否合租">
-            <el-select v-model="form.region">
+            <el-select v-model="query.region">
               <el-option label="是" value="1"></el-option>
               <el-option label="否" value="0"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="价格区间">
             <el-col :span="11">
-              <el-input v-model="query.name" placeholder="最小"></el-input>
+              <el-input v-model="query.min" placeholder="最小"></el-input>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
             <el-col :span="11">
-              <el-input v-model="query.name" placeholder="最大"></el-input>
+              <el-input v-model="query.max" placeholder="最大"></el-input>
             </el-col>
           </el-form-item>
         </el-form>
@@ -47,17 +47,15 @@
         ref="multipleTable"
         header-cell-class-name="table-header"
       >
-        <el-table-column
-          prop="id"
-          label="ID"
-          width="55"
-          align="center"
-        ></el-table-column>
-        <el-table-column prop="name" label="用户名"></el-table-column>
-        <el-table-column label="账户余额">
-          <template slot-scope="scope">￥{{ scope.row.money }}</template>
+        <el-table-column prop="name" label="地址">
+          <template slot-scope="scope"
+            >{{ scope.row.area }}{{ scope.row.address }}</template
+          >
         </el-table-column>
-        <el-table-column label="头像(查看大图)" align="center">
+        <el-table-column label="房租">
+          <template slot-scope="scope">￥{{ scope.row.rentNum }}</template>
+        </el-table-column>
+        <!-- <el-table-column label="房屋照片(查看大图)" align="center">
           <template slot-scope="scope">
             <el-image
               class="table-td-thumb"
@@ -65,31 +63,38 @@
               :preview-src-list="[scope.row.thumb]"
             ></el-image>
           </template>
+        </el-table-column> -->
+        <el-table-column
+          prop="rentalTime"
+          label="出租时长(月)"
+        ></el-table-column>
+        <el-table-column prop="shareNum" label="出租类型">
+          <template slot-scope="scope">{{
+            scope.row.shareNum === 1 ? "整租" : "合租"
+          }}</template>
         </el-table-column>
-        <el-table-column prop="address" label="地址"></el-table-column>
+        <el-table-column prop="roomType" label="房型"></el-table-column>
+        <el-table-column prop="houseDesc" label="房屋介绍"></el-table-column>
+        <!-- 房屋出租状态:0：待租；1：出租中；2：房屋待续租；3：房客发起房屋续租；4：房客发起租房申请；5：房东同意续租申请 -->
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
-            <el-tag
-              :type="
-                scope.row.state === '成功'
-                  ? 'success'
-                  : scope.row.state === '失败'
-                  ? 'danger'
-                  : ''
-              "
-              >{{ scope.row.state }}</el-tag
-            >
+            <el-tag>{{ showStatus(scope.row.houseRentStatus) }}</el-tag>
           </template>
         </el-table-column>
-
-        <el-table-column prop="date" label="注册时间"></el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
             <el-button
               type="text"
-              icon="el-icon-shopping-cart-full"
+              icon="el-icon-edit"
               @click="handleEdit(scope.$index, scope.row)"
-              >申请</el-button
+              >编辑</el-button
+            >
+            <el-button
+              type="text"
+              icon="el-icon-delete"
+              class="red"
+              @click="handleDelete(scope.$index, scope.row)"
+              >删除</el-button
             >
           </template>
         </el-table-column>
@@ -107,56 +112,64 @@
     </div>
 
     <!-- 编辑弹出框 -->
-    <el-dialog title="出租房屋信息" :visible.sync="editVisible" width="50%">
+    <el-dialog title="出租房屋信息" :visible.sync="editVisible" width="70%">
       <el-form ref="form" :model="form" label-width="120px">
         <el-form-item label="地址">
           <el-cascader
-            v-model="form.area"
+            v-model="form.areaCopy"
             :options="options"
             @change="handleChange"
           ></el-cascader>
           <el-input
             style="width: 200px; display: inline-block; margin-left: 10px"
-            v-model="form.name"
+            v-model="form.address"
           ></el-input>
         </el-form-item>
         <el-form-item label="房租">
-          <el-input v-model="form.address"></el-input>
+          <el-input v-model="form.rentNum"></el-input>
         </el-form-item>
         <el-form-item label="出租时长(月)">
-          <el-input v-model="form.address"></el-input>
+          <el-input v-model="form.rentalTime"></el-input>
         </el-form-item>
         <el-form-item label="出租类型">
-          <el-radio-group v-model="form.resource">
-            <el-radio label="合租"></el-radio>
-            <el-radio label="单租"></el-radio>
+          <el-radio-group v-model="form.shareNum">
+            <el-radio label="1">整租</el-radio>
+            <el-radio label="2">合租</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="房型">
-          <el-input v-model="form.address"></el-input>
+          <el-input v-model="form.roomType"></el-input>
         </el-form-item>
         <el-form-item label="房屋介绍">
-          <el-input v-model="form.address" type="textarea"></el-input>
+          <el-input v-model="form.houseDesc" type="textarea"></el-input>
         </el-form-item>
         <el-form-item label="房屋照片">
           <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
+            v-if="!form.housePicture"
+            action="http://rap2api.taobao.org/app/mock/299165/house/picture"
             list-type="picture-card"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess1"
           >
             <i class="el-icon-plus"></i>
           </el-upload>
+          <div v-else>
+            <img :src="form.housePicture" alt="" height="148" />
+          </div>
         </el-form-item>
         <el-form-item label="产权照片">
           <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
+            v-if="!form.houseType"
+            action="http://rap2api.taobao.org/app/mock/299165/house/picture"
             list-type="picture-card"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess2"
           >
             <i class="el-icon-plus"></i>
           </el-upload>
+          <div v-else>
+            <img :src="form.houseType" alt="" height="148" />
+          </div>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -172,13 +185,13 @@
 
 <script>
 import areaList from "../../assets/js/json";
+import { getHouse, modifyHouse, delHouse, upHouse } from "../../api/index";
+
 export default {
   name: "basetable",
   data() {
     return {
       query: {
-        address: "",
-        name: "",
         pageIndex: 1,
         pageSize: 10,
       },
@@ -193,60 +206,54 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       options: areaList,
+      imgUrl1: "",
+      imgUrl2: "",
     };
   },
   created() {
     this.getData();
   },
   methods: {
+    handleAvatarSuccess1(res, file) {
+      console.log("handleAvatarSuccess,", res);
+      this.$set(this.form, "housePicture", URL.createObjectURL(file.raw));
+      this.imgUrl1 = res.data;
+    },
+    handleAvatarSuccess2(res, file) {
+      this.$set(this.form, "houseType", URL.createObjectURL(file.raw));
+      this.imgUrl2 = res.data;
+    },
+    handleChange(v) {
+      console.log(v);
+    },
+    //       <!-- 房屋出租状态:0：待租；1：出租中；2：房屋待续租；3：房客发起房屋续租；4：房客发起租房申请；5：房东同意续租申请 -->
+    showStatus(it) {
+      switch (it) {
+        case 0:
+          return "待租";
+        case 1:
+          return "出租中";
+        case 2:
+          return "房屋待续租";
+        case 3:
+          return "房客发起房屋续租";
+        case 4:
+          return "房客发起租房申请";
+        case 5:
+          return "房东同意续租申请";
+      }
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    // 获取 easy-mock 的模拟数据
     getData() {
-      (this.tableData = [
-        {
-          id: 1,
-          name: "张三",
-          money: 123,
-          address: "广东省东莞市长安镇",
-          state: "成功",
-          date: "2019-11-1",
-          thumb: "https://lin-xin.gitee.io/images/post/wms.png",
-        },
-        {
-          id: 2,
-          name: "李四",
-          money: 456,
-          address: "广东省广州市白云区",
-          state: "成功",
-          date: "2019-10-11",
-          thumb: "https://lin-xin.gitee.io/images/post/node3.png",
-        },
-        {
-          id: 3,
-          name: "王五",
-          money: 789,
-          address: "湖南省长沙市",
-          state: "失败",
-          date: "2019-11-11",
-          thumb: "https://lin-xin.gitee.io/images/post/parcel.png",
-        },
-        {
-          id: 4,
-          name: "赵六",
-          money: 1011,
-          address: "福建省厦门市鼓浪屿",
-          state: "成功",
-          date: "2019-10-20",
-          thumb: "https://lin-xin.gitee.io/images/post/notice.png",
-        },
-      ]),
-        (this.pageTotal = 4);
+      getHouse({
+        page: this.query.pageIndex,
+        size: this.query.pageSize,
+      }).then((res) => {
+        this.pageTotal = res.data.total;
+        this.tableData = res.data.list;
+      });
     },
     // 触发搜索按钮
     handleSearch() {
@@ -260,25 +267,13 @@ export default {
         type: "warning",
       })
         .then(() => {
-          console.log("row", row);
-          this.$message.success("删除成功");
-          this.tableData.splice(index, 1);
+          delHouse(row.houseId).then((res) => {
+            console.log("delHouse", res);
+            this.getData();
+            this.$message.success("删除成功");
+          });
         })
         .catch(() => {});
-    },
-    // 多选操作
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    delAllSelection() {
-      const length = this.multipleSelection.length;
-      let str = "";
-      this.delList = this.delList.concat(this.multipleSelection);
-      for (let i = 0; i < length; i++) {
-        str += this.multipleSelection[i].name + " ";
-      }
-      this.$message.error(`删除了${str}`);
-      this.multipleSelection = [];
     },
     addInfo() {
       this.form = {};
@@ -288,13 +283,35 @@ export default {
     handleEdit(index, row) {
       this.idx = index;
       this.form = row;
+      this.form.areaCopy = row.area.split(",");
       this.editVisible = true;
     },
     // 保存编辑
     saveEdit() {
-      this.editVisible = false;
-      this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-      this.$set(this.tableData, this.idx, this.form);
+      if (this.form.houseId) {
+        this.editVisible = false;
+        modifyHouse(this.form.houseId, {
+          ...this.form,
+          area: this.form.areaCopy.join(","),
+        }).then((res) => {
+          this.form = {};
+          this.getData();
+          console.log("resp---", res);
+        });
+        this.$message.success(`修改成功`);
+      } else {
+        upHouse({
+          ...this.form,
+          area: this.form.areaCopy.join(","),
+          housePicture: this.imgUrl1,
+          houseType: this.imgUrl2,
+        }).then(() => {
+          this.editVisible = false;
+          this.form = {};
+          this.getData();
+        });
+        this.$message.success(`新增成功`);
+      }
     },
     // 分页导航
     handlePageChange(val) {
@@ -308,10 +325,10 @@ export default {
 <style scoped>
 .handle-box {
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
 }
-.handle-box .el-col-2 {
-  text-align: center;
-}
+
 .handle-select {
   width: 120px;
 }
@@ -335,9 +352,5 @@ export default {
   margin: auto;
   width: 40px;
   height: 40px;
-}
-.searchWrap {
-  display: flex;
-  flex-direction: row-reverse;
 }
 </style>

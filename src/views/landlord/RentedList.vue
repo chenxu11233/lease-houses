@@ -19,42 +19,64 @@
         header-cell-class-name="table-header"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column
-          prop="id"
-          label="ID"
-          width="55"
-          align="center"
-        ></el-table-column>
-        <el-table-column prop="name" label="用户名"></el-table-column>
-        <el-table-column label="账户余额">
-          <template slot-scope="scope">￥{{ scope.row.money }}</template>
+        <el-table-column prop="name" label="地址">
+          <template slot-scope="scope"
+            >{{ scope.row.area }}{{ scope.row.address }}</template
+          >
         </el-table-column>
-        <el-table-column label="头像(查看大图)" align="center">
+        <el-table-column label="房租">
+          <template slot-scope="scope">￥{{ scope.row.rentNum }}</template>
+        </el-table-column>
+        <el-table-column label="房屋照片(查看大图)" align="center">
           <template slot-scope="scope">
             <el-image
               class="table-td-thumb"
-              :src="scope.row.thumb"
-              :preview-src-list="[scope.row.thumb]"
+              :src="scope.row.housePicture"
+              :preview-src-list="[scope.row.housePicture]"
             ></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="address" label="地址"></el-table-column>
-        <el-table-column label="状态" align="center">
+        <el-table-column label="产权照片(查看大图)" align="center">
           <template slot-scope="scope">
-            <el-tag
-              :type="
-                scope.row.state === '成功'
-                  ? 'success'
-                  : scope.row.state === '失败'
-                  ? 'danger'
-                  : ''
-              "
-              >{{ scope.row.state }}</el-tag
+            <el-image
+              class="table-td-thumb"
+              :src="scope.row.houseType"
+              :preview-src-list="[scope.row.houseType]"
+            ></el-image>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="rentalTime"
+          label="出租时长(月)"
+        ></el-table-column>
+        <el-table-column prop="shareNum" label="出租类型">
+          <template slot-scope="scope">{{
+            scope.row.shareNum === 1 ? "整租" : "合租"
+          }}</template>
+        </el-table-column>
+        <el-table-column prop="roomType" label="房型"></el-table-column>
+        <el-table-column prop="lodger.name" label="租客名字"></el-table-column>
+        <el-table-column prop="lodger.phone" label="租客手机"></el-table-column>
+        <el-table-column
+          prop="lodger.idCard"
+          label="租客身份证"
+        ></el-table-column>
+        <el-table-column
+          prop="lodger.profession"
+          label="租客职业"
+        ></el-table-column>
+        <el-table-column prop="lodger.sex" label="租客性别">
+          <template slot-scope="scope">{{
+            scope.row.lodger.sex == "0" ? "男" : "女"
+          }}</template>
+        </el-table-column>
+        <el-table-column label="合同" width="180" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" @click="linkContract(scope.row)"
+              >查看</el-button
             >
           </template>
         </el-table-column>
-
-        <el-table-column prop="date" label="注册时间"></el-table-column>
       </el-table>
       <div class="pagination">
         <el-pagination
@@ -74,6 +96,8 @@
 </template>
 
 <script>
+import { getHouse } from "../../api/index";
+
 export default {
   name: "basetable",
   data() {
@@ -100,6 +124,22 @@ export default {
     this.getData();
   },
   methods: {
+    showStatus(it) {
+      switch (it) {
+        case 0:
+          return "待租";
+        case 1:
+          return "出租中";
+        case 2:
+          return "房屋待续租";
+        case 3:
+          return "房客发起房屋续租";
+        case 4:
+          return "房客发起租房申请";
+        case 5:
+          return "房东同意续租申请";
+      }
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
@@ -109,45 +149,13 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      (this.tableData = [
-        {
-          id: 1,
-          name: "张三",
-          money: 123,
-          address: "广东省东莞市长安镇",
-          state: "成功",
-          date: "2019-11-1",
-          thumb: "https://lin-xin.gitee.io/images/post/wms.png",
-        },
-        {
-          id: 2,
-          name: "李四",
-          money: 456,
-          address: "广东省广州市白云区",
-          state: "成功",
-          date: "2019-10-11",
-          thumb: "https://lin-xin.gitee.io/images/post/node3.png",
-        },
-        {
-          id: 3,
-          name: "王五",
-          money: 789,
-          address: "湖南省长沙市",
-          state: "失败",
-          date: "2019-11-11",
-          thumb: "https://lin-xin.gitee.io/images/post/parcel.png",
-        },
-        {
-          id: 4,
-          name: "赵六",
-          money: 1011,
-          address: "福建省厦门市鼓浪屿",
-          state: "成功",
-          date: "2019-10-20",
-          thumb: "https://lin-xin.gitee.io/images/post/notice.png",
-        },
-      ]),
-        (this.pageTotal = 4);
+      getHouse({
+        page: this.query.pageIndex,
+        size: this.query.pageSize,
+      }).then((res) => {
+        this.pageTotal = res.data.total;
+        this.tableData = res.data.list;
+      });
     },
     // 触发搜索按钮
     handleSearch() {
@@ -185,17 +193,34 @@ export default {
       this.form = {};
       this.editVisible = true;
     },
-    // 编辑操作
-    handleEdit(index, row) {
-      this.idx = index;
-      this.form = row;
-      this.editVisible = true;
-    },
-    // 保存编辑
-    saveEdit() {
-      this.editVisible = false;
-      this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-      this.$set(this.tableData, this.idx, this.form);
+    //  address: "",
+    //   landlordName: "",
+    //   lodgerName: "",
+    //   date: "",
+    //   price: "",
+    linkContract(row) {
+      let d = new Date();
+      d.setMonth(d.getMonth() + Number(row.rentalTime));
+      let yy1 = d.getFullYear();
+      let mm1 = d.getMonth() + 1; //因为getMonth（）返回值是 0（一月） 到 11（十二月） 之间的一个整数。所以要给其加1
+      let dd1 = d.getDate();
+      if (mm1 < 10) {
+        mm1 = "0" + mm1;
+      }
+      if (dd1 < 10) {
+        dd1 = "0" + dd1;
+      }
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const data = {};
+      data.address = row.area + row.address;
+      data.landlordName = userInfo.name;
+      data.landlordId = localStorage.getItem("id");
+      data.lodgerName = row.lodger.name;
+      data.lodgerId = row.lodger.idCard;
+      data.date = yy1 + "-" + mm1 + "-" + dd1;
+      data.price = row.rentNum;
+      localStorage.setItem("cInfo", JSON.stringify(data));
+      window.open("/#/contract");
     },
     // 分页导航
     handlePageChange(val) {

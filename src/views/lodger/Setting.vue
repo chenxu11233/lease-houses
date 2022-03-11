@@ -4,15 +4,15 @@
       <div class="form-box">
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="昵称">
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.nickname"></el-input>
           </el-form-item>
           <el-form-item label="姓名">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
           <el-form-item label="性别">
-            <el-radio-group v-model="form.resource">
-              <el-radio label="男"></el-radio>
-              <el-radio label="女"></el-radio>
+            <el-radio-group v-model="form.sex">
+              <el-radio :label="0">男</el-radio>
+              <el-radio :label="1">女</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="电话">
@@ -24,8 +24,11 @@
           <el-form-item label="年收入">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
+          <el-form-item label="电话">
+            <el-input v-model="form.phone"></el-input>
+          </el-form-item>
           <el-form-item label="身份证" required>
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.idCard"></el-input>
             <div style="color: red">需完善才能出租房屋</div>
           </el-form-item>
           <el-form-item>
@@ -38,78 +41,33 @@
 </template>
 
 <script>
+import { getUser, modifyUser } from "../../api/index";
+
 export default {
-  name: "baseform",
+  name: "Setting",
   data() {
     return {
-      options: [
-        {
-          value: "guangdong",
-          label: "广东省",
-          children: [
-            {
-              value: "guangzhou",
-              label: "广州市",
-              children: [
-                {
-                  value: "tianhe",
-                  label: "天河区",
-                },
-                {
-                  value: "haizhu",
-                  label: "海珠区",
-                },
-              ],
-            },
-            {
-              value: "dongguan",
-              label: "东莞市",
-              children: [
-                {
-                  value: "changan",
-                  label: "长安镇",
-                },
-                {
-                  value: "humen",
-                  label: "虎门镇",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          value: "hunan",
-          label: "湖南省",
-          children: [
-            {
-              value: "changsha",
-              label: "长沙市",
-              children: [
-                {
-                  value: "yuelu",
-                  label: "岳麓区",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: true,
-        type: ["步步高"],
-        resource: "小天才",
-        desc: "",
-        options: [],
-      },
+      form: {},
     };
   },
+  mounted() {
+    this.getUser();
+  },
   methods: {
+    getUser() {
+      getUser().then((res) => {
+        this.form = res.data;
+        localStorage.setItem("lid", res.data.idCard);
+        console.log("user", res);
+      });
+    },
     onSubmit() {
-      this.$message.success("提交成功！");
+      modifyUser(this.form).then((res) => {
+        if (res.code === 200) {
+          this.$message.success("修改成功！");
+        }
+        this.getUser();
+      });
     },
   },
 };
