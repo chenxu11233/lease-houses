@@ -68,3 +68,19 @@ export const agreeHouseRent = (data) => {
     data,
   });
 };
+
+export const requestHouse = (data) => {
+  return request({
+    url: "/house/request",
+    method: "post",
+    data,
+  });
+};
+
+export const leaseRenewalHouse = (data) => {
+  return request({
+    url: "/house/leaseRenewal",
+    method: "post",
+    data,
+  });
+};

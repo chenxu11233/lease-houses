@@ -19,18 +19,24 @@
             ></el-cascader>
           </el-form-item>
           <el-form-item label="是否合租">
-            <el-select v-model="query.region">
-              <el-option label="是" value="1"></el-option>
-              <el-option label="否" value="0"></el-option>
+            <el-select v-model="query.share">
+              <el-option label="是" :value="true"></el-option>
+              <el-option label="否" :value="false"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="价格区间">
             <el-col :span="11">
-              <el-input v-model="query.min" placeholder="最小"></el-input>
+              <el-input
+                v-model="query.rentMinNum"
+                placeholder="最小"
+              ></el-input>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
             <el-col :span="11">
-              <el-input v-model="query.max" placeholder="最大"></el-input>
+              <el-input
+                v-model="query.rentMaxNum"
+                placeholder="最大"
+              ></el-input>
             </el-col>
           </el-form-item>
         </el-form>
@@ -74,27 +80,28 @@
           }}</template>
         </el-table-column>
         <el-table-column prop="roomType" label="房型"></el-table-column>
+        <el-table-column label="图片" align="center">
+          <template slot-scope="scope">
+            <el-image
+              :src="scope.row.housePicture"
+              :preview-src-list="[scope.row.housePicture]"
+            ></el-image>
+          </template>
+        </el-table-column>
         <el-table-column prop="houseDesc" label="房屋介绍"></el-table-column>
         <!-- 房屋出租状态:0：待租；1：出租中；2：房屋待续租；3：房客发起房屋续租；4：房客发起租房申请；5：房东同意续租申请 -->
-        <el-table-column label="状态" align="center">
+        <!-- <el-table-column label="状态" align="center">
           <template slot-scope="scope">
             <el-tag>{{ showStatus(scope.row.houseRentStatus) }}</el-tag>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
-            <el-button
-              type="text"
-              icon="el-icon-edit"
-              @click="handleEdit(scope.$index, scope.row)"
-              >编辑</el-button
+            <el-button type="text" @click="applyH(scope.$index, scope.row)"
+              >申请</el-button
             >
-            <el-button
-              type="text"
-              icon="el-icon-delete"
-              class="red"
-              @click="handleDelete(scope.$index, scope.row)"
-              >删除</el-button
+            <el-button type="text" @click="handleEdit(scope.$index, scope.row)"
+              >查看详情</el-button
             >
           </template>
         </el-table-column>
@@ -112,8 +119,13 @@
     </div>
 
     <!-- 编辑弹出框 -->
-    <el-dialog title="出租房屋信息" :visible.sync="editVisible" width="70%">
-      <el-form ref="form" :model="form" label-width="120px">
+    <el-dialog
+      title="出租房屋信息"
+      class="dialog-none"
+      :visible.sync="editVisible"
+      width="70%"
+    >
+      <el-form ref="form" :model="form" label-width="120px" :disabled="true">
         <el-form-item label="地址">
           <el-cascader
             v-model="form.areaCopy"
@@ -153,9 +165,13 @@
           >
             <i class="el-icon-plus"></i>
           </el-upload>
-          <div v-else>
-            <img :src="form.housePicture" alt="" height="148" />
-          </div>
+          <el-image
+            v-else
+            height="148"
+            class="table-td-thumb"
+            :src="form.housePicture"
+            :preview-src-list="[form.housePicture]"
+          ></el-image>
         </el-form-item>
         <el-form-item label="产权照片">
           <el-upload
@@ -167,14 +183,17 @@
           >
             <i class="el-icon-plus"></i>
           </el-upload>
-          <div v-else>
-            <img :src="form.houseType" alt="" height="148" />
-          </div>
+          <el-image
+            v-else
+            height="148"
+            class="table-td-thumb"
+            :src="form.houseType"
+            :preview-src-list="[form.houseType]"
+          ></el-image>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveEdit">确 定</el-button>
       </span>
     </el-dialog>
     <el-dialog :visible.sync="dialogVisible">
@@ -185,13 +204,17 @@
 
 <script>
 import areaList from "../../assets/js/json";
-import { getHouse, modifyHouse, delHouse, upHouse } from "../../api/index";
+import { getHouse, delHouse, requestHouse } from "../../api/index";
 
 export default {
   name: "basetable",
   data() {
     return {
       query: {
+        rentMaxNum: "",
+        rentMinNum: "",
+        area: "",
+        share: "",
         pageIndex: 1,
         pageSize: 10,
       },
@@ -250,6 +273,10 @@ export default {
       getHouse({
         page: this.query.pageIndex,
         size: this.query.pageSize,
+        area: this.query.area,
+        share: this.query.share,
+        rentMinNum: this.query.rentMinNum,
+        rentMaxNum: this.query.rentMaxNum,
       }).then((res) => {
         this.pageTotal = res.data.total;
         this.tableData = res.data.list;
@@ -279,39 +306,22 @@ export default {
       this.form = {};
       this.editVisible = true;
     },
+    // 申请
+    applyH(index, row) {
+      requestHouse({
+        houseId: row.houseId,
+        rentDuration: row.rentalTime,
+      }).then(() => {
+        this.getData();
+        this.$message.success("申请成功");
+      });
+    },
     // 编辑操作
     handleEdit(index, row) {
       this.idx = index;
       this.form = row;
       this.form.areaCopy = row.area.split(",");
       this.editVisible = true;
-    },
-    // 保存编辑
-    saveEdit() {
-      if (this.form.houseId) {
-        this.editVisible = false;
-        modifyHouse(this.form.houseId, {
-          ...this.form,
-          area: this.form.areaCopy.join(","),
-        }).then((res) => {
-          this.form = {};
-          this.getData();
-          console.log("resp---", res);
-        });
-        this.$message.success(`修改成功`);
-      } else {
-        upHouse({
-          ...this.form,
-          area: this.form.areaCopy.join(","),
-          housePicture: this.imgUrl1,
-          houseType: this.imgUrl2,
-        }).then(() => {
-          this.editVisible = false;
-          this.form = {};
-          this.getData();
-        });
-        this.$message.success(`新增成功`);
-      }
     },
     // 分页导航
     handlePageChange(val) {
@@ -348,9 +358,6 @@ export default {
   margin-right: 10px;
 }
 .table-td-thumb {
-  display: block;
-  margin: auto;
-  width: 40px;
-  height: 40px;
+  height: 148px;
 }
 </style>
