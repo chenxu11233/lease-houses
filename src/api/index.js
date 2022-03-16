@@ -60,6 +60,21 @@ export const getHouseRent = () => {
     method: "get",
   });
 };
+export const auditHouse = (data) => {
+  return request({
+    url: `/audit/house`,
+    method: "post",
+    data,
+  });
+};
+
+export const auditRent = (data) => {
+  return request({
+    url: `/audit/rent`,
+    method: "post",
+    data,
+  });
+};
 
 export const agreeHouseRent = (data) => {
   return request({
