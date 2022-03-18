@@ -11,14 +11,14 @@
         v-if="!register"
       >
         <el-form-item prop="username">
-          <el-input v-model="param.username" placeholder="username">
+          <el-input v-model="param.username" placeholder="账号">
             <i slot="prefix" class="el-icon-user"></i>
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
             type="password"
-            placeholder="password"
+            placeholder="密码"
             v-model="param.password"
             @keyup.enter.native="submitForm()"
           >
@@ -32,21 +32,21 @@
       </el-form>
       <el-form
         :model="param"
-        :rules="rules"
+        :rules="rulesR"
         ref="register"
         label-width="0px"
         class="ms-content"
         v-else
       >
         <el-form-item prop="username">
-          <el-input v-model="param.username" placeholder="username">
+          <el-input v-model="param.username" placeholder="账号">
             <i slot="prefix" class="el-icon-user"></i>
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
             type="password"
-            placeholder="password"
+            placeholder="密码"
             v-model="param.password"
             @keyup.enter.native="submitForm()"
           >
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { login } from "../api/index";
+import { login, register } from "../api/index";
 export default {
   data: function () {
     return {
@@ -86,6 +86,13 @@ export default {
           { required: true, message: "请输入用户名", trigger: "blur" },
         ],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+      },
+      rulesR: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+        ],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        type: [{ required: true, message: "请选择用户类型", trigger: "blur" }],
       },
       register: false,
       options: [
@@ -120,18 +127,38 @@ export default {
       });
     },
     submitForm() {
-      this.$refs.login.validate((valid) => {
-        if (valid) {
-          this.login();
-        } else {
-          this.$message.error("请输入账号和密码");
-          console.log("error submit!!");
-          return false;
-        }
-      });
+      if (!this.register) {
+        this.$refs.login.validate((valid) => {
+          if (valid) {
+            this.login();
+          } else {
+            this.$message.error("请输入账号和密码");
+            console.log("error submit!!");
+            return false;
+          }
+        });
+      } else {
+        this.$refs.register.validate((valid) => {
+          if (valid) {
+            register({
+              account: this.param.username,
+              password: this.param.password,
+            }).then((res) => {
+              if (res.code == 200) {
+                this.$message.success("注册成功", 2);
+                this.changeRegister();
+              }
+            });
+          }
+        });
+      }
     },
     changeRegister() {
       this.register = !this.register;
+      this.param = {
+        username: "",
+        password: "",
+      };
     },
   },
 };

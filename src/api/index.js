@@ -8,6 +8,14 @@ export const login = (data) => {
   });
 };
 
+export const register = (data) => {
+  return request({
+    url: "/register",
+    method: "post",
+    data,
+  });
+};
+
 export const getUser = () => {
   return request({
     url: "/user",
@@ -97,5 +105,20 @@ export const leaseRenewalHouse = (data) => {
     url: "/house/leaseRenewal",
     method: "post",
     data,
+  });
+};
+
+export const getTenantAuditInfo = () => {
+  return request({
+    url: "/house/tenant/auditInfo",
+    method: "get",
+  });
+};
+
+export const getUserList = (params) => {
+  return request({
+    url: "/user/list",
+    method: "get",
+    params,
   });
 };

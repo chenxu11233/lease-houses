@@ -35,44 +35,18 @@
             ></el-image>
           </template>
         </el-table-column>
+        <el-table-column prop="rentTime" label="出租时长(月)"></el-table-column>
+        <el-table-column prop="owner.name" label="房东姓名"></el-table-column>
         <el-table-column
-          prop="rentalTime"
-          label="出租时长(月)"
-        ></el-table-column>
-        <el-table-column prop="shareNum" label="出租类型">
-          <template slot-scope="scope">{{
-            scope.row.shareNum === 1 ? "整租" : "合租"
-          }}</template>
-        </el-table-column>
-        <el-table-column prop="roomType" label="房型"></el-table-column>
-        <el-table-column
-          prop="landlord.name"
-          label="房东姓名"
-        ></el-table-column>
-        <el-table-column
-          prop="landlord.idCard"
-          label="房东身份证号"
-        ></el-table-column>
-        <el-table-column
-          prop="landlord.phone"
+          prop="owner.phone"
           label="房东联系方式"
         ></el-table-column>
-        <el-table-column label="状态" align="center">
+        <el-table-column label="状态" align="center" width="180">
           <template slot-scope="scope">
-            <el-tag>{{ showStatus(scope.row.houseRentStatus) }}</el-tag>
+            <el-tag>{{ showStatus(scope.row.status) }}</el-tag>
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination
-          background
-          layout="total, prev, pager, next"
-          :current-page="query.pageIndex"
-          :page-size="query.pageSize"
-          :total="pageTotal"
-          @current-change="handlePageChange"
-        ></el-pagination>
-      </div>
     </div>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="" />
@@ -81,7 +55,7 @@
 </template>
 
 <script>
-import { getHouse, leaseRenewalHouse } from "../../api/index";
+import { leaseRenewalHouse, getTenantAuditInfo } from "../../api/index";
 
 export default {
   name: "basetable",
@@ -121,18 +95,12 @@ export default {
     },
     showStatus(it) {
       switch (it) {
-        case 0:
-          return "待租";
-        case 1:
-          return "出租中";
         case 2:
-          return "房屋待续租";
+          return "申请中";
         case 3:
-          return "房客发起房屋续租";
-        case 4:
-          return "房客发起租房申请";
-        case 5:
-          return "房东同意续租申请";
+          return "续租中";
+        case 6:
+          return "退租中";
       }
     },
     handleRemove(file, fileList) {
@@ -144,31 +112,28 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      getHouse({
-        page: this.query.pageIndex,
-        size: this.query.pageSize,
-      }).then((res) => {
-        this.pageTotal = res.data.total;
-        this.tableData = res.data.list;
+      getTenantAuditInfo().then((res) => {
+        console.log("resres", res);
+        let data2 = res.data["2"].map((item) => {
+          return {
+            ...item,
+            status: 2,
+          };
+        });
+        let data3 = res.data["3"].map((item) => {
+          return {
+            ...item,
+            status: 3,
+          };
+        });
+        let data6 = res.data["6"].map((item) => {
+          return {
+            ...item,
+            status: 6,
+          };
+        });
+        this.tableData = data2.concat(data3).concat(data6);
       });
-    },
-    // 触发搜索按钮
-    handleSearch() {
-      this.$set(this.query, "pageIndex", 1);
-      this.getData();
-    },
-    // 删除操作
-    handleDelete(index, row) {
-      // 二次确认删除
-      this.$confirm("确定要删除吗？", "提示", {
-        type: "warning",
-      })
-        .then(() => {
-          console.log("row", row);
-          this.$message.success("删除成功");
-          this.tableData.splice(index, 1);
-        })
-        .catch(() => {});
     },
     // 多选操作
     handleSelectionChange(val) {

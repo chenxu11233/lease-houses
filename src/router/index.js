@@ -62,8 +62,8 @@ const routes = [
         component: () => import("../views/admin/LandlordList.vue"),
       },
       {
-        path: "/adminLodgerList",
-        component: () => import("../views/admin/LodgerList.vue"),
+        path: "/adminUserList",
+        component: () => import("../views/admin/UserList.vue"),
       },
       {
         path: "/adminContractList",

@@ -72,20 +72,8 @@ export default {
       // admin
       {
         icon: "el-icon-connection",
-        title: "用户管理",
-        index: 3,
-        subs: [
-          {
-            icon: "el-icon-document-checked",
-            index: "adminLandlordList",
-            title: "租客列表",
-          },
-          {
-            icon: "el-icon-tickets",
-            index: "adminLodgerList",
-            title: "房东列表",
-          },
-        ],
+        index: "adminUserList",
+        title: "用户列表",
       },
       {
         icon: "el-icon-connection",
