@@ -159,9 +159,9 @@ export default {
       },
     ];
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    if (userInfo.type === "0") {
+    if (userInfo.type === 0) {
       this.items = lodger;
-    } else if (userInfo.type === "1") {
+    } else if (userInfo.type === 1) {
       this.items = landlord;
     } else {
       this.items = adminMenu;

@@ -19,7 +19,7 @@
           </el-tooltip>
         </div>
         <!-- 消息中心 -->
-        <div class="btn-bell">
+        <!-- <div class="btn-bell">
           <el-tooltip
             effect="dark"
             :content="message ? `有${message}条未读消息` : `消息中心`"
@@ -30,10 +30,10 @@
             </router-link>
           </el-tooltip>
           <span class="btn-bell-badge" v-if="message"></span>
-        </div>
+        </div> -->
         <!-- 用户头像 -->
         <div class="user-avator">
-          <img src="../assets/img/img.jpg" />
+          <img :src="tx" />
         </div>
         <!-- 用户名下拉菜单 -->
         <el-dropdown class="user-name" trigger="click" @command="handleCommand">
@@ -53,6 +53,9 @@
 </template>
 <script>
 import bus from "../assets/js/bus";
+const fk = require("../assets/img/fk.png");
+const fd = require("../assets/img/fd.png");
+const ad = require("../assets/img/ad.png");
 export default {
   data() {
     return {
@@ -66,6 +69,16 @@ export default {
     username() {
       let username = localStorage.getItem("ms_username");
       return username ? username : this.name;
+    },
+    tx() {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      if (userInfo.type === 0) {
+        return fk;
+      } else if (userInfo.type === 1) {
+        return fd;
+      } else {
+        return ad;
+      }
     },
   },
   methods: {

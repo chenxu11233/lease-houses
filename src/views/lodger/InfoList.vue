@@ -20,8 +20,8 @@
           </el-form-item>
           <el-form-item label="是否合租">
             <el-select v-model="query.share">
-              <el-option label="是" :value="true"></el-option>
-              <el-option label="否" :value="false"></el-option>
+              <el-option label="是" :value="1"></el-option>
+              <el-option label="否" :value="2"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="价格区间">
@@ -204,7 +204,7 @@
 
 <script>
 import areaList from "../../assets/js/json";
-import { getHouse, delHouse, requestHouse } from "../../api/index";
+import { getHouse, delHouse, requestHouse, getUser } from "../../api/index";
 
 export default {
   name: "basetable",
@@ -213,7 +213,7 @@ export default {
       query: {
         rentMaxNum: "",
         rentMinNum: "",
-        area: "",
+        area: [],
         share: "",
         pageIndex: 1,
         pageSize: 10,
@@ -231,12 +231,20 @@ export default {
       options: areaList,
       imgUrl1: "",
       imgUrl2: "",
+      user: {},
     };
   },
   created() {
+    this.getUser();
     this.getData();
   },
   methods: {
+    getUser() {
+      getUser().then((res) => {
+        this.user = res.data;
+        localStorage.setItem("lid", res.data.idCard);
+      });
+    },
     handleAvatarSuccess1(res, file) {
       console.log("handleAvatarSuccess,", res);
       this.$set(this.form, "housePicture", URL.createObjectURL(file.raw));
@@ -270,11 +278,12 @@ export default {
       console.log(file, fileList);
     },
     getData() {
+      console.log("this.query.area", this.query.area);
       getHouse({
         page: this.query.pageIndex,
         size: this.query.pageSize,
-        area: this.query.area,
-        share: this.query.share,
+        area: this.query.area.length > 0 ? this.query.area.join(",") : "",
+        shareNum: this.query.share,
         rentMinNum: this.query.rentMinNum,
         rentMaxNum: this.query.rentMaxNum,
       }).then((res) => {
@@ -308,6 +317,10 @@ export default {
     },
     // 申请
     applyH(index, row) {
+      if (!this.user.idCard && !this.user.name) {
+        this.$message.warning("请先完善个人信息");
+        return;
+      }
       requestHouse({
         houseId: row.houseId,
         rentDuration: row.rentalTime,

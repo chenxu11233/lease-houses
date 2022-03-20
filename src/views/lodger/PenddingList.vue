@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { leaseRenewalHouse, getTenantAuditInfo } from "../../api/index";
+import { getTenantAuditInfo } from "../../api/index";
 
 export default {
   name: "basetable",
@@ -83,24 +83,14 @@ export default {
     this.getData();
   },
   methods: {
-    handleCheck(index, row, type) {
-      leaseRenewalHouse({
-        houseId: row.houseId,
-        rentNum: row.rentNum,
-        type: type,
-      }).then((res) => {
-        console.log("leaseRenewalHouse", res);
-        this.getData();
-      });
-    },
     showStatus(it) {
       switch (it) {
-        case 2:
-          return "申请中";
         case 3:
-          return "续租中";
+          return "续租申请中";
+        case 4:
+          return "租房申请中";
         case 6:
-          return "退租中";
+          return "退租申请中";
       }
     },
     handleRemove(file, fileList) {
@@ -114,25 +104,26 @@ export default {
     getData() {
       getTenantAuditInfo().then((res) => {
         console.log("resres", res);
-        let data2 = res.data["2"].map((item) => {
-          return {
-            ...item,
-            status: 2,
-          };
-        });
-        let data3 = res.data["3"].map((item) => {
+        let data3 = (res.data["3"] || []).map((item) => {
           return {
             ...item,
             status: 3,
           };
         });
-        let data6 = res.data["6"].map((item) => {
+        let data4 = (res.data["4"] || []).map((item) => {
+          return {
+            ...item,
+            status: 4,
+          };
+        });
+        let data6 = (res.data["6"] || []).map((item) => {
           return {
             ...item,
             status: 6,
           };
         });
-        this.tableData = data2.concat(data3).concat(data6);
+        this.tableData = data4.concat(data3).concat(data6);
+        console.log("tableData", this.tableData);
       });
     },
     // 多选操作

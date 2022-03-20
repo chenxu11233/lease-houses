@@ -55,10 +55,10 @@
           }}</template>
         </el-table-column>
         <el-table-column prop="roomType" label="房型"></el-table-column>
-        <el-table-column prop="lodger.name" label="房东名字"></el-table-column>
-        <el-table-column prop="lodger.phone" label="房东手机"></el-table-column>
+        <el-table-column prop="owner.name" label="房东名字"></el-table-column>
+        <el-table-column prop="owner.phone" label="房东手机"></el-table-column>
         <el-table-column
-          prop="lodger.idCard"
+          prop="owner.idCard"
           label="房东身份证"
         ></el-table-column>
         <el-table-column prop="lodger.name" label="租客名字"></el-table-column>
@@ -73,7 +73,7 @@
         ></el-table-column>
         <el-table-column prop="lodger.sex" label="租客性别">
           <template slot-scope="scope">{{
-            scope.row.lodger.sex == "0" ? "男" : "女"
+            scope.row.lodger && scope.row.lodger.sex == "0" ? "男" : "女"
           }}</template>
         </el-table-column>
         <el-table-column label="合同" width="180" align="center">
@@ -84,16 +84,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination
-          background
-          layout="total, prev, pager, next"
-          :current-page="query.pageIndex"
-          :page-size="query.pageSize"
-          :total="pageTotal"
-          @current-change="handlePageChange"
-        ></el-pagination>
-      </div>
     </div>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="" />
@@ -102,7 +92,7 @@
 </template>
 
 <script>
-import { getHouse } from "../../api/index";
+import { getAdRentHouse } from "../../api/index";
 
 export default {
   name: "basetable",
@@ -155,12 +145,8 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      getHouse({
-        page: this.query.pageIndex,
-        size: this.query.pageSize,
-      }).then((res) => {
-        this.pageTotal = res.data.total;
-        this.tableData = res.data.list;
+      getAdRentHouse().then((res) => {
+        this.tableData = res.data;
       });
     },
     // 触发搜索按钮
@@ -218,8 +204,8 @@ export default {
       }
       const data = {};
       data.address = row.area + row.address;
-      data.landlordName = row.landlord.name;
-      data.landlordId = row.landlord.idCard;
+      data.landlordName = row.owner.name;
+      data.landlordId = row.owner.idCard;
       data.lodgerName = row.lodger.name;
       data.lodgerId = row.lodger.idCard;
       data.date = yy1 + "-" + mm1 + "-" + dd1;

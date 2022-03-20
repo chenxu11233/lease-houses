@@ -2,12 +2,20 @@ import axios from "axios";
 
 const service = axios.create({
   // process.env.NODE_ENV === 'development' 来判断是否开发环境
-  baseURL: "http://rap2api.taobao.org/app/mock/299165",
-  timeout: 5000,
+  baseURL: "/api",
+  timeout: 30000,
 });
 
 service.interceptors.request.use(
   (config) => {
+    const userId =
+      localStorage.getItem("userInfo") &&
+      JSON.parse(localStorage.getItem("userInfo")).userId;
+    if (userId) {
+      // 添加headers
+      config.headers.userId = userId;
+      config.headers["content-type"] = "application/json;charset=UTF-8";
+    }
     return config;
   },
   (error) => {

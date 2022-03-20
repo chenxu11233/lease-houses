@@ -16,16 +16,13 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="电话">
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.phone"></el-input>
           </el-form-item>
           <el-form-item label="职业">
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.profession"></el-input>
           </el-form-item>
           <el-form-item label="年收入">
-            <el-input v-model="form.name"></el-input>
-          </el-form-item>
-          <el-form-item label="电话">
-            <el-input v-model="form.phone"></el-input>
+            <el-input v-model="form.revenue"></el-input>
           </el-form-item>
           <el-form-item label="身份证" required>
             <el-input v-model="form.idCard"></el-input>

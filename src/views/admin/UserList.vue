@@ -15,21 +15,26 @@
         ref="multipleTable"
         header-cell-class-name="table-header"
       >
-        <el-table-column prop="userId" label="用户ID"></el-table-column>
         <el-table-column prop="name" label="姓名"></el-table-column>
         <el-table-column prop="nickname" label="用户名"></el-table-column>
+        <el-table-column
+          prop="userId"
+          label="用户ID"
+          width="80px"
+          :show-overflow-tooltip="true"
+        ></el-table-column>
         <el-table-column prop="profession" label="职业"></el-table-column>
         <el-table-column prop="revenue" label="年收入"></el-table-column>
         <el-table-column prop="phone" label="电话"></el-table-column>
         <el-table-column prop="idCard" label="身份证"></el-table-column>
         <el-table-column prop="shareNum" label="性别">
           <template slot-scope="scope">{{
-            scope.row.shareNum === 1 ? "男" : "女"
+            scope.row.sex === 1 ? "男" : "女"
           }}</template>
         </el-table-column>
-        <el-table-column prop="shareNum" label="用户类型">
+        <el-table-column prop="type" label="用户类型">
           <template slot-scope="scope">{{
-            scope.row.shareNum === 0 ? "房客" : "房东"
+            scope.row.type === 0 ? "房客" : "房东"
           }}</template>
         </el-table-column>
       </el-table>

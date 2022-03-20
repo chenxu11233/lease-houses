@@ -32,7 +32,7 @@
           <template slot-scope="scope">{{ scope.row.address }}</template>
         </el-table-column>
         <!-- 房屋出租状态:0：待租；1：出租中；2：房屋待续租；3：房客发起房屋续租；4：房客发起租房申请；5：房东同意续租申请 -->
-        <el-table-column label="状态" align="center">
+        <el-table-column label="状态" align="center" width="150px">
           <template slot-scope="scope">
             <el-tag>{{ showStatus(scope.row.type) }}</el-tag>
           </template>

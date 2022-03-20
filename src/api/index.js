@@ -100,11 +100,10 @@ export const requestHouse = (data) => {
   });
 };
 
-export const leaseRenewalHouse = (data) => {
+export const leaseRenewalHouse = (houseId, rentNum, type) => {
   return request({
-    url: "/house/leaseRenewal",
+    url: `/house/leaseRenewal?houseId=${houseId}&rentNum=${rentNum}&type=${type}`,
     method: "post",
-    data,
   });
 };
 
@@ -120,5 +119,35 @@ export const getUserList = (params) => {
     url: "/user/list",
     method: "get",
     params,
+  });
+};
+
+export const getCurrentRentHouse = (params) => {
+  return request({
+    url: "/house/currentRentHouse",
+    method: "get",
+    params,
+  });
+};
+
+export const getAdminAuditInfo = (params) => {
+  return request({
+    url: "/house/admin/auditInfo",
+    method: "get",
+    params,
+  });
+};
+
+export const getAdRentHouse = () => {
+  return request({
+    url: "/house/admin/getRentHouse",
+    method: "get",
+  });
+};
+
+export const getOwnerRentHouse = () => {
+  return request({
+    url: "/house/owner/getRentHouse",
+    method: "get",
   });
 };

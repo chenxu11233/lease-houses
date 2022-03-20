@@ -53,9 +53,13 @@
         <el-table-column prop="roomType" label="房型"></el-table-column>
         <el-table-column prop="houseDesc" label="房屋介绍"></el-table-column>
         <!-- 房屋出租状态:0：待租；1：出租中；2：房屋待续租；3：房客发起房屋续租；4：房客发起租房申请；5：房东同意续租申请 -->
-        <el-table-column label="状态" align="center">
+        <el-table-column label="状态" align="center" width="150px">
           <template slot-scope="scope">
-            <el-tag>{{ showStatus(scope.row.houseRentStatus) }}</el-tag>
+            <el-tag>{{
+              scope.row.houseAuditStatus === 0
+                ? "未审核发布"
+                : showStatus(scope.row.houseRentStatus)
+            }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180" align="center">
@@ -110,8 +114,8 @@
         </el-form-item>
         <el-form-item label="出租类型">
           <el-radio-group v-model="form.shareNum">
-            <el-radio label="1">整租</el-radio>
-            <el-radio label="2">合租</el-radio>
+            <el-radio :label="1">整租</el-radio>
+            <el-radio :label="2">合租</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="房型">
@@ -123,7 +127,7 @@
         <el-form-item label="房屋照片">
           <el-upload
             v-if="!form.housePicture"
-            action="http://rap2api.taobao.org/app/mock/299165/house/picture"
+            action="/api/house/picture"
             list-type="picture-card"
             :show-file-list="false"
             :on-success="handleAvatarSuccess1"
@@ -132,12 +136,13 @@
           </el-upload>
           <div v-else>
             <img :src="form.housePicture" alt="" height="148" />
+            <span @click="() => delImg(form, 'housePicture')">删除</span>
           </div>
         </el-form-item>
         <el-form-item label="产权照片">
           <el-upload
             v-if="!form.houseType"
-            action="http://rap2api.taobao.org/app/mock/299165/house/picture"
+            action="/api/house/picture"
             list-type="picture-card"
             :show-file-list="false"
             :on-success="handleAvatarSuccess2"
@@ -146,6 +151,7 @@
           </el-upload>
           <div v-else>
             <img :src="form.houseType" alt="" height="148" />
+            <span @click="() => delImg(form, 'houseType')">删除</span>
           </div>
         </el-form-item>
       </el-form>
@@ -162,12 +168,19 @@
 
 <script>
 import areaList from "../../assets/js/json";
-import { getHouse, modifyHouse, delHouse, upHouse } from "../../api/index";
+import {
+  getHouse,
+  modifyHouse,
+  delHouse,
+  upHouse,
+  getUser,
+} from "../../api/index";
 
 export default {
   name: "basetable",
   data() {
     return {
+      user: {},
       query: {
         pageIndex: 1,
         pageSize: 10,
@@ -188,9 +201,19 @@ export default {
     };
   },
   created() {
+    this.getUser();
     this.getData();
   },
   methods: {
+    getUser() {
+      getUser().then((res) => {
+        this.user = res.data;
+        localStorage.setItem("id", res.data.idCard);
+      });
+    },
+    delImg(item, key) {
+      this.$set(item, `${key}`, "");
+    },
     handleAvatarSuccess1(res, file) {
       console.log("handleAvatarSuccess,", res);
       this.$set(this.form, "housePicture", URL.createObjectURL(file.raw));
@@ -253,6 +276,10 @@ export default {
         .catch(() => {});
     },
     addInfo() {
+      if (!this.user.idCard) {
+        this.$message.warning("请完善个人信息");
+        return;
+      }
       this.form = {};
       this.editVisible = true;
     },
@@ -260,6 +287,7 @@ export default {
     handleEdit(index, row) {
       this.idx = index;
       this.form = row;
+      console.log("this.form ", this.form);
       this.form.areaCopy = row.area.split(",");
       this.editVisible = true;
     },
@@ -270,6 +298,8 @@ export default {
         modifyHouse(this.form.houseId, {
           ...this.form,
           area: this.form.areaCopy.join(","),
+          housePicture: this.imgUrl1,
+          houseType: this.imgUrl2,
         }).then((res) => {
           this.form = {};
           this.getData();

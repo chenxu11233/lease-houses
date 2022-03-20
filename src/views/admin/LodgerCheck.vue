@@ -49,7 +49,7 @@
         ></el-table-column>
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
-            <el-tag>{{ showStatus(scope.row.houseRentStatus) }}</el-tag>
+            <el-tag>{{ showStatus(scope.row.status) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180" align="center">
@@ -63,16 +63,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination
-          background
-          layout="total, prev, pager, next"
-          :current-page="query.pageIndex"
-          :page-size="query.pageSize"
-          :total="pageTotal"
-          @current-change="handlePageChange"
-        ></el-pagination>
-      </div>
     </div>
 
     <!-- 编辑弹出框 -->
@@ -107,7 +97,7 @@
         <el-form-item label="房屋介绍">
           <el-input v-model="form.houseDesc" type="textarea"></el-input>
         </el-form-item>
-        <el-form-item label="房屋照片">
+        <!-- <el-form-item label="房屋照片">
           <el-upload
             v-if="!form.housePicture"
             action="http://rap2api.taobao.org/app/mock/299165/house/picture"
@@ -134,7 +124,7 @@
           <div v-else>
             <img :src="form.houseType" alt="" height="148" />
           </div>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取 消</el-button>
@@ -148,7 +138,12 @@
 
 <script>
 import areaList from "../../assets/js/json";
-import { getHouse, modifyHouse, auditRent, upHouse } from "../../api/index";
+import {
+  getAdminAuditInfo,
+  modifyHouse,
+  auditRent,
+  upHouse,
+} from "../../api/index";
 
 export default {
   name: "basetable",
@@ -193,30 +188,42 @@ export default {
     showStatus(it) {
       switch (it) {
         case 0:
-          return "待租";
+          return "房屋续租";
         case 1:
-          return "出租中";
+          return "租房申请";
         case 2:
-          return "房屋待续租";
-        case 3:
-          return "房客发起房屋续租";
-        case 4:
-          return "房客发起租房申请";
-        case 5:
-          return "房东同意续租申请";
+          return "退租申请";
       }
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
     getData() {
-      getHouse({
-        page: this.query.pageIndex,
-        size: this.query.pageSize,
-        houseAuditStatus: 0,
-      }).then((res) => {
-        this.pageTotal = res.data.total;
-        this.tableData = res.data.list;
+      getAdminAuditInfo().then((res) => {
+        console.log("res", res);
+        let data0 = res.data["0"] || [];
+        let data1 = res.data["1"] || [];
+        let data2 = res.data["2"] || [];
+        data0 = data0.map((item) => {
+          return {
+            ...item,
+            status: 0,
+          };
+        });
+        data1 = data1.map((item) => {
+          return {
+            ...item,
+            status: 1,
+          };
+        });
+        data2 = data2.map((item) => {
+          return {
+            ...item,
+            status: 2,
+          };
+        });
+        this.tableData = data0.concat(data1).concat(data2);
+        console.log("tableData", this.tableData);
       });
     },
     // 触发搜索按钮

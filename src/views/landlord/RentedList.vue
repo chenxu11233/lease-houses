@@ -1,16 +1,6 @@
 <template>
   <div>
     <div class="container">
-      <div class="handle-box">
-        <el-input
-          v-model="query.name"
-          placeholder="用户名"
-          class="handle-input mr10"
-        ></el-input>
-        <el-button type="primary" icon="el-icon-search" @click="handleSearch"
-          >搜索</el-button
-        >
-      </div>
       <el-table
         :data="tableData"
         border
@@ -78,16 +68,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination
-          background
-          layout="total, prev, pager, next"
-          :current-page="query.pageIndex"
-          :page-size="query.pageSize"
-          :total="pageTotal"
-          @current-change="handlePageChange"
-        ></el-pagination>
-      </div>
     </div>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="" />
@@ -96,7 +76,7 @@
 </template>
 
 <script>
-import { getHouse } from "../../api/index";
+import { getOwnerRentHouse } from "../../api/index";
 
 export default {
   name: "basetable",
@@ -149,12 +129,8 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      getHouse({
-        page: this.query.pageIndex,
-        size: this.query.pageSize,
-      }).then((res) => {
-        this.pageTotal = res.data.total;
-        this.tableData = res.data.list;
+      getOwnerRentHouse().then((res) => {
+        this.tableData = res.data;
       });
     },
     // 触发搜索按钮

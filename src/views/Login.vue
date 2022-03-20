@@ -113,16 +113,21 @@ export default {
         account: this.param.username,
         password: this.param.password,
       }).then((res) => {
-        this.$message.success("登录成功", 2);
-        localStorage.setItem("ms_username", res.data.account);
-        localStorage.setItem("userInfo", JSON.stringify(res.data));
-        // 0 访客  1房东  2 admin
-        if (Number(res.data.type) === 1) {
-          this.$router.push("/infoList");
-        } else if (Number(res.data.type) === 0) {
-          this.$router.push("/lodgerRentingList");
+        console.log("er", res);
+        if (res.code === 200) {
+          this.$message.success("登录成功", 2);
+          localStorage.setItem("ms_username", res.data.account);
+          localStorage.setItem("userInfo", JSON.stringify(res.data));
+          // 0 访客  1房东  2 admin
+          if (Number(res.data.type) === 1) {
+            this.$router.push("/infoList");
+          } else if (Number(res.data.type) === 0) {
+            this.$router.push("/lodgerRentingList");
+          } else {
+            this.$router.push("/adminUserList");
+          }
         } else {
-          this.$router.push("/adminLandlordList");
+          this.$message.error(res.message, 2);
         }
       });
     },
@@ -143,6 +148,7 @@ export default {
             register({
               account: this.param.username,
               password: this.param.password,
+              type: this.param.type,
             }).then((res) => {
               if (res.code == 200) {
                 this.$message.success("注册成功", 2);

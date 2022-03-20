@@ -45,16 +45,13 @@
           }}</template>
         </el-table-column>
         <el-table-column prop="roomType" label="房型"></el-table-column>
+        <el-table-column prop="owner.name" label="房东姓名"></el-table-column>
         <el-table-column
-          prop="landlord.name"
-          label="房东姓名"
-        ></el-table-column>
-        <el-table-column
-          prop="landlord.idCard"
+          prop="owner.idCard"
           label="房东身份证号"
         ></el-table-column>
         <el-table-column
-          prop="landlord.phone"
+          prop="owner.phone"
           label="房东联系方式"
         ></el-table-column>
         <el-table-column label="合同" align="center">
@@ -82,16 +79,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination
-          background
-          layout="total, prev, pager, next"
-          :current-page="query.pageIndex"
-          :page-size="query.pageSize"
-          :total="pageTotal"
-          @current-change="handlePageChange"
-        ></el-pagination>
-      </div>
     </div>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="" />
@@ -100,7 +87,7 @@
 </template>
 
 <script>
-import { getHouse, leaseRenewalHouse } from "../../api/index";
+import { getCurrentRentHouse, leaseRenewalHouse } from "../../api/index";
 
 export default {
   name: "basetable",
@@ -129,11 +116,7 @@ export default {
   },
   methods: {
     handleCheck(index, row, type) {
-      leaseRenewalHouse({
-        houseId: row.houseId,
-        rentNum: row.rentNum,
-        type: type,
-      }).then((res) => {
+      leaseRenewalHouse(row.houseId, row.rentNum, type).then((res) => {
         console.log("leaseRenewalHouse", res);
         this.getData();
       });
@@ -163,12 +146,8 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     getData() {
-      getHouse({
-        page: this.query.pageIndex,
-        size: this.query.pageSize,
-      }).then((res) => {
-        this.pageTotal = res.data.total;
-        this.tableData = res.data.list;
+      getCurrentRentHouse().then((res) => {
+        this.tableData = res.data;
       });
     },
     // 触发搜索按钮
@@ -227,8 +206,8 @@ export default {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       const data = {};
       data.address = row.area + row.address;
-      data.landlordName = row.landlord.name;
-      data.landlordId = row.landlord.idCard;
+      data.landlordName = row.owner.name;
+      data.landlordId = row.owner.idCard;
       data.lodgerName = userInfo.name;
       data.lodgerId = userInfo.idCard || "";
       data.date = yy1 + "-" + mm1 + "-" + dd1;
