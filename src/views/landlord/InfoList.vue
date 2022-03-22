@@ -71,6 +71,7 @@
               >编辑</el-button
             >
             <el-button
+              v-if="scope.row.houseRentStatus !== 1"
               type="text"
               icon="el-icon-delete"
               class="red"
@@ -240,7 +241,7 @@ export default {
         case 4:
           return "房客发起租房申请";
         case 5:
-          return "房东同意续租申请";
+          return "房东同意申请";
         case 6:
           return "房屋待退租";
       }

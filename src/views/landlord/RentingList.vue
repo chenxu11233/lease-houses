@@ -142,10 +142,12 @@ export default {
     // },
     // 编辑操作
     handleEdit(index, row, type) {
+      let tp = row.type == 3 ? 1 : row.type === 4 ? 2 : 0;
       agreeHouseRent({
         houseId: row.houseId,
         userId: row.userId,
         pass: type,
+        type: tp,
       }).then((res) => {
         console.log("agreeHouseRent", res);
         if (type) {

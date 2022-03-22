@@ -66,14 +66,14 @@
             <el-button
               type="text"
               icon="el-icon-circle-check"
-              @click="handleCheck(scope.$index, scope.row, '1')"
+              @click="handleCheck(scope.$index, scope.row, 1)"
               >续租</el-button
             >
             <el-button
               type="text"
               icon="el-icon-circle-close"
               class="red"
-              @click="handleCheck(scope.$index, scope.row, '0')"
+              @click="handleCheck(scope.$index, scope.row, 0)"
               >退租</el-button
             >
           </template>
