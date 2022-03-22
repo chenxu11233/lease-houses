@@ -241,6 +241,8 @@ export default {
           return "房客发起租房申请";
         case 5:
           return "房东同意续租申请";
+        case 6:
+          return "房屋待退租";
       }
     },
     handleRemove(file, fileList) {

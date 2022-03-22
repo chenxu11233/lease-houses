@@ -42,14 +42,14 @@
             <el-button
               type="text"
               icon="el-icon-circle-check"
-              @click="handleEdit(scope.$index, scope.row)"
+              @click="handleEdit(scope.$index, scope.row, true)"
               >同意</el-button
             >
             <el-button
               type="text"
               icon="el-icon-circle-close"
               class="red"
-              @click="handleDelete(scope.$index, scope.row)"
+              @click="handleEdit(scope.$index, scope.row, false)"
               >拒绝</el-button
             >
           </template>
@@ -104,6 +104,8 @@ export default {
           return "房客发起租房申请";
         case 5:
           return "房东同意续租申请";
+        case 6:
+          return "房屋待退租";
       }
     },
     handleRemove(file, fileList) {
@@ -139,12 +141,18 @@ export default {
     //     .catch(() => {});
     // },
     // 编辑操作
-    handleEdit(index, row) {
+    handleEdit(index, row, type) {
       agreeHouseRent({
         houseId: row.houseId,
         userId: row.userId,
+        pass: type,
       }).then((res) => {
         console.log("agreeHouseRent", res);
+        if (type) {
+          this.$message.success("已同意");
+        } else {
+          this.$message.warning("已拒绝");
+        }
         this.getData();
       });
     },
