@@ -66,6 +66,7 @@
         </el-form-item>
         <div class="login-btn">
           <el-button type="warning" @click="submitForm()">确定</el-button>
+          <el-button @click="returnBack()">返回</el-button>
         </div>
       </el-form>
     </div>
@@ -78,8 +79,8 @@ export default {
   data: function () {
     return {
       param: {
-        username: "admin",
-        password: "123123",
+        username: "",
+        password: "",
       },
       rules: {
         username: [
@@ -108,6 +109,9 @@ export default {
     };
   },
   methods: {
+    returnBack() {
+      this.register = !this.register;
+    },
     login() {
       login({
         account: this.param.username,

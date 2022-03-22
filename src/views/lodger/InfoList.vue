@@ -20,8 +20,8 @@
           </el-form-item>
           <el-form-item label="是否合租">
             <el-select v-model="query.share">
-              <el-option label="是" :value="1"></el-option>
-              <el-option label="否" :value="2"></el-option>
+              <el-option label="否" :value="false"></el-option>
+              <el-option label="是" :value="true"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="价格区间">
@@ -41,6 +41,13 @@
           </el-form-item>
         </el-form>
         <div class="searchWrap">
+          <el-button
+            type="primary"
+            style="margin-bottom: 6px"
+            icon="el-icon-search"
+            @click="handleClearSearch"
+            >清空搜索条件</el-button
+          >
           <el-button type="primary" icon="el-icon-search" @click="handleSearch"
             >搜索</el-button
           >
@@ -283,13 +290,26 @@ export default {
         page: this.query.pageIndex,
         size: this.query.pageSize,
         area: this.query.area.length > 0 ? this.query.area.join(",") : "",
-        shareNum: this.query.share,
+        share: this.query.share,
         rentMinNum: this.query.rentMinNum,
         rentMaxNum: this.query.rentMaxNum,
       }).then((res) => {
         this.pageTotal = res.data.total;
         this.tableData = res.data.list;
       });
+    },
+    // 触发搜索按钮
+    handleClearSearch() {
+      let a = {
+        rentMaxNum: "",
+        rentMinNum: "",
+        area: [],
+        share: "",
+        pageIndex: 1,
+        pageSize: 10,
+      };
+      this.query = a;
+      this.getData();
     },
     // 触发搜索按钮
     handleSearch() {

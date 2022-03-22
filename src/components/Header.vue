@@ -42,6 +42,9 @@
             <i class="el-icon-caret-bottom"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item divided command="modifyPass"
+              >修改密码</el-dropdown-item
+            >
             <el-dropdown-item divided command="loginout"
               >退出登录</el-dropdown-item
             >
@@ -87,6 +90,8 @@ export default {
       if (command == "loginout") {
         localStorage.removeItem("ms_username");
         this.$router.push("/Login");
+      } else if (command == "modifyPass") {
+        bus.$emit("show-modify-password", true);
       }
     },
     // 侧边栏折叠
