@@ -1,7 +1,7 @@
 module.exports = {
   devServer: {
     host: "localhost", // 允许外部ip访问
-    port: 8081, // 端口
+    port: 8080, // 端口
     https: false, // 启用https
     proxy: {
       "/api": {

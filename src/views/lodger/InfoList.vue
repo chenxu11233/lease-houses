@@ -249,7 +249,7 @@ export default {
     getUser() {
       getUser().then((res) => {
         this.user = res.data;
-        localStorage.setItem("lid", res.data.idCard);
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
       });
     },
     handleAvatarSuccess1(res, file) {

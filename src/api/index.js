@@ -100,9 +100,9 @@ export const requestHouse = (data) => {
   });
 };
 
-export const leaseRenewalHouse = (houseId, rentNum, type) => {
+export const leaseRenewalHouse = (houseId, rentNum, type, rentTime) => {
   return request({
-    url: `/house/leaseRenewal?houseId=${houseId}&rentNum=${rentNum}&type=${type}`,
+    url: `/house/leaseRenewal?houseId=${houseId}&rentNum=${rentNum}&type=${type}&rentTime=${rentTime}`,
     method: "post",
   });
 };

@@ -22,6 +22,7 @@
         <el-table-column prop="name" label="租户姓名"></el-table-column>
         <el-table-column prop="idCard" label="身份证"></el-table-column>
         <el-table-column prop="profession" label="职业"></el-table-column>
+        <el-table-column prop="revenue" label="年收入"></el-table-column>
         <el-table-column prop="phone" label="手机号码"></el-table-column>
         <el-table-column prop="sex" label="性别">
           <template slot-scope="scope">{{

@@ -59,7 +59,7 @@ const routes = [
       },
       {
         path: "/adminLandlordList",
-        component: () => import("../views/admin/LandlordList.vue"),
+        component: () => import("../views/admin/UserList1.vue"),
       },
       {
         path: "/adminUserList",

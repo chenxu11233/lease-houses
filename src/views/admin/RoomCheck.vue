@@ -52,13 +52,21 @@
             <el-tag>{{ showStatus(scope.row.houseAuditStatus) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" align="center">
+        <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button type="text" @click="handleEdit(scope.$index, scope.row)"
               >查看详情</el-button
             >
-            <el-button type="text" @click="handlePass(scope.$index, scope.row)"
+            <el-button
+              type="text"
+              @click="handlePass(scope.$index, scope.row, true)"
               >通过</el-button
+            >
+            <el-button
+              type="text"
+              style="color: red"
+              @click="handlePass(scope.$index, scope.row, false)"
+              >拒绝</el-button
             >
           </template>
         </el-table-column>
@@ -216,13 +224,17 @@ export default {
       this.$set(this.query, "pageIndex", 1);
       this.getData();
     },
-    handlePass(index, row) {
+    handlePass(index, row, pass) {
       auditHouse({
         houseId: row.houseId,
-        pass: true,
+        pass: pass,
       }).then(() => {
         this.getData();
-        this.$message.success("审核成功");
+        if (pass) {
+          this.$message.success("审核成功");
+        } else {
+          this.$message.warning("已拒绝");
+        }
       });
     },
     addInfo() {

@@ -73,7 +73,12 @@ export default {
       {
         icon: "el-icon-connection",
         index: "adminUserList",
-        title: "用户列表",
+        title: "房客列表",
+      },
+      {
+        icon: "el-icon-connection",
+        index: "adminLandlordList",
+        title: "房东列表",
       },
       {
         icon: "el-icon-connection",
@@ -170,7 +175,8 @@ export default {
   methods: {
     getUser() {
       getUser().then((res) => {
-        localStorage.setItem("id", res.data.idCard);
+        this.user = res.data;
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
       });
     },
   },

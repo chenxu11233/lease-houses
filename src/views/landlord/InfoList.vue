@@ -209,7 +209,7 @@ export default {
     getUser() {
       getUser().then((res) => {
         this.user = res.data;
-        localStorage.setItem("id", res.data.idCard);
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
       });
     },
     delImg(item, key) {

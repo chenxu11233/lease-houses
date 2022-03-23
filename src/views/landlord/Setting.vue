@@ -2,7 +2,7 @@
   <div>
     <div class="container">
       <div class="form-box">
-        <el-form ref="form" :model="form" label-width="80px">
+        <el-form ref="form" :model="form" label-width="80px" :rules="rules">
           <el-form-item label="昵称">
             <el-input v-model="form.nickname"></el-input>
           </el-form-item>
@@ -12,7 +12,7 @@
           <el-form-item label="电话">
             <el-input v-model="form.phone"></el-input>
           </el-form-item>
-          <el-form-item label="身份证" required>
+          <el-form-item label="身份证" required prop="idCard">
             <el-input v-model="form.idCard"></el-input>
             <div style="color: red">需完善才能出租房屋</div>
           </el-form-item>
@@ -31,8 +31,25 @@ import { getUser, modifyUser } from "../../api/index";
 export default {
   name: "Setting",
   data() {
+    const checkIDCard = (rule, value, callback) => {
+      const IDCardReg =
+        /^\d{6}(18|19|20)?\d{2}(0[1-9]|1[0-2])(([0-2][1-9])|10|20|30|31)\d{3}(\d|X|x)$/;
+      // const sfzhReg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
+      if (value) {
+        if (IDCardReg.test(value)) {
+          callback();
+        } else {
+          callback(new Error("身份证号格式不正确"));
+        }
+      } else {
+        callback(new Error("请输入身份证号"));
+      }
+    };
     return {
       form: {},
+      rules: {
+        idCard: { required: false, validator: checkIDCard, trigger: "blur" },
+      },
     };
   },
   mounted() {
@@ -42,16 +59,20 @@ export default {
     getUser() {
       getUser().then((res) => {
         this.form = res.data;
-        localStorage.setItem("id", res.data.idCard);
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
         console.log("user", res);
       });
     },
     onSubmit() {
-      modifyUser(this.form).then((res) => {
-        if (res.code === 200) {
-          this.$message.success("修改成功！");
+      this.$refs["form"].validate((valid) => {
+        if (valid) {
+          modifyUser(this.form).then((res) => {
+            if (res.code === 200) {
+              this.$message.success("修改成功！");
+            }
+            this.getUser();
+          });
         }
-        this.getUser();
       });
     },
   },

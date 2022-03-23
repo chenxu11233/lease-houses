@@ -17,8 +17,6 @@
       >
         <el-table-column prop="name" label="姓名"></el-table-column>
         <el-table-column prop="nickname" label="用户名"></el-table-column>
-        <el-table-column prop="profession" label="职业"></el-table-column>
-        <el-table-column prop="revenue" label="年收入"></el-table-column>
         <el-table-column prop="phone" label="电话"></el-table-column>
         <el-table-column prop="idCard" label="身份证"></el-table-column>
         <el-table-column prop="shareNum" label="性别">
@@ -100,7 +98,7 @@ export default {
       getUserList({
         page: this.query.pageIndex,
         size: this.query.pageSize,
-        type: 0,
+        type: 1,
       }).then((res) => {
         this.pageTotal = res.data.total;
         this.tableData = res.data.list;

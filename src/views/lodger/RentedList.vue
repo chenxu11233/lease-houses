@@ -66,7 +66,7 @@
             <el-button
               type="text"
               icon="el-icon-circle-check"
-              @click="handleCheck(scope.$index, scope.row, 1)"
+              @click="openDio(scope.row)"
               >续租</el-button
             >
             <el-button
@@ -80,6 +80,24 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      title="填写续租时间"
+      :visible.sync="dialogVisible1"
+      width="400px"
+    >
+      <el-form ref="form" :model="sub">
+        <el-form-item label="续租月份">
+          <el-input
+            style="width: 200px; display: inline-block; margin-left: 10px"
+            v-model="sub.mon"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible1 = false">取 消</el-button>
+        <el-button type="primary" @click="submit">确 定</el-button>
+      </span>
+    </el-dialog>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="" />
     </el-dialog>
@@ -109,17 +127,40 @@ export default {
       id: -1,
       dialogImageUrl: "",
       dialogVisible: false,
+      dialogVisible1: false,
+      rowData: {},
+      sub: {},
     };
   },
   created() {
     this.getData();
   },
   methods: {
-    handleCheck(index, row, type) {
-      leaseRenewalHouse(row.houseId, row.rentNum, type).then((res) => {
+    openDio(row) {
+      this.rowData = row;
+      this.dialogVisible1 = true;
+    },
+    submit() {
+      if (this.sub.mon) {
+        this.handleCheck1(this.sub.mon, this.rowData, 1);
+        this.dialogVisible1 = false;
+      } else {
+        this.$message.warning("请填写");
+      }
+    },
+    handleCheck1(index, row, type) {
+      leaseRenewalHouse(row.houseId, row.rentNum, type, index).then((res) => {
         console.log("leaseRenewalHouse", res);
         this.getData();
       });
+    },
+    handleCheck(index, row, type) {
+      leaseRenewalHouse(row.houseId, row.rentNum, type, row.rentalTime).then(
+        (res) => {
+          console.log("leaseRenewalHouse", res);
+          this.getData();
+        }
+      );
     },
     showStatus(it) {
       switch (it) {

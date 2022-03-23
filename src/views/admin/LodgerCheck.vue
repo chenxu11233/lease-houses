@@ -57,8 +57,16 @@
             <el-button type="text" @click="handleEdit(scope.$index, scope.row)"
               >查看详情</el-button
             >
-            <el-button type="text" @click="handlePass(scope.$index, scope.row)"
+            <el-button
+              type="text"
+              @click="handlePass(scope.$index, scope.row, true)"
               >通过</el-button
+            >
+            <el-button
+              type="text"
+              style="color: red"
+              @click="handlePass(scope.$index, scope.row, false)"
+              >拒绝</el-button
             >
           </template>
         </el-table-column>
@@ -231,15 +239,34 @@ export default {
       this.$set(this.query, "pageIndex", 1);
       this.getData();
     },
-    handlePass(index, row) {
-      auditRent({
-        houseId: row.houseId,
-        pass: true,
-      }).then((res) => {
-        console.log("delHouse", res);
-        this.getData();
-        this.$message.success("审核成功");
-      });
+    handlePass(index, row, pass) {
+      if (row.status === 2) {
+        auditRent({
+          houseId: row.houseId,
+          pass: !pass,
+        }).then((res) => {
+          console.log("delHouse", res);
+          this.getData();
+          if (pass) {
+            this.$message.success("审核成功");
+          } else {
+            this.$message.warning("已拒绝");
+          }
+        });
+      } else {
+        auditRent({
+          houseId: row.houseId,
+          pass: pass,
+        }).then((res) => {
+          console.log("delHouse", res);
+          this.getData();
+          if (pass) {
+            this.$message.success("审核成功");
+          } else {
+            this.$message.warning("已拒绝");
+          }
+        });
+      }
     },
     addInfo() {
       this.form = {};

@@ -35,7 +35,10 @@
             ></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="rentTime" label="出租时长(月)"></el-table-column>
+        <el-table-column
+          prop="rentalTime"
+          label="出租时长(月)"
+        ></el-table-column>
         <el-table-column prop="owner.name" label="房东姓名"></el-table-column>
         <el-table-column
           prop="owner.phone"
