@@ -157,6 +157,8 @@ export default {
               if (res.code == 200) {
                 this.$message.success("注册成功", 2);
                 this.changeRegister();
+              } else {
+                this.$message.error(res.message, 2);
               }
             });
           }
